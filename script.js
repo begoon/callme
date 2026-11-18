@@ -1,5 +1,6 @@
 import { icons } from "./icons.js";
-import { buildLinks, decodeState, encodeState, isNationalNumber } from "./links.js";
+import { registerServiceWorker } from "./pwa.js";
+import { buildLinks, decodeState, encodeState, isNationalNumber, services } from "./links.js";
 
 const SVG = "http://www.w3.org/2000/svg";
 const EXAMPLE = "44 (759) 000 1122";
@@ -8,6 +9,11 @@ const telElement = document.getElementById("tel");
 const textElement = document.getElementById("text");
 const hintElement = document.getElementById("hint");
 const linksElement = document.getElementById("links");
+const brandsElement = document.getElementById("brands");
+const clearElements = document.querySelectorAll(".clear");
+const themeElement = document.getElementById("theme");
+const updateElement = document.getElementById("update");
+const applyElement = document.getElementById("apply");
 
 function iconElement(id) {
     const { color, viewBox, d } = icons[id];
@@ -20,6 +26,34 @@ function iconElement(id) {
     pathElement.setAttribute("d", d);
     svgElement.append(pathElement);
     return svgElement;
+}
+
+function brandElement({ id, name }) {
+    const element = document.createElement("span");
+    element.title = name;
+    element.append(iconElement(id));
+    return element;
+}
+
+const systemTheme = () => (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+const currentTheme = () => document.documentElement.dataset.theme || systemTheme();
+
+function renderTheme() {
+    const other = currentTheme() === "dark" ? "light" : "dark";
+    themeElement.title = `Switch to the ${other} theme`;
+    themeElement.ariaLabel = themeElement.title;
+    themeElement.replaceChildren(iconElement(other === "dark" ? "moon" : "sun"));
+}
+
+function toggleTheme() {
+    const theme = currentTheme() === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = theme;
+    try {
+        localStorage.setItem("theme", theme);
+    } catch {
+        // The theme still applies for this visit when storage is unavailable.
+    }
+    renderTheme();
 }
 
 function rowElement({ id, name, link }) {
@@ -63,8 +97,12 @@ function render() {
         links.push({ id: "share", name: "page", link });
     }
     linksElement.replaceChildren(...links.map(rowElement));
+    brandsElement.hidden = Boolean(input.trim());
     hintElement.textContent = hint(input);
     hintElement.hidden = !hintElement.textContent;
+    for (const clearElement of clearElements) {
+        clearElement.hidden = !document.getElementById(clearElement.dataset.for).value;
+    }
     return state;
 }
 
@@ -106,7 +144,31 @@ for (const exampleElement of document.querySelectorAll(".example")) {
     });
 }
 
+for (const clearElement of clearElements) {
+    clearElement.addEventListener("click", () => {
+        const inputElement = document.getElementById(clearElement.dataset.for);
+        inputElement.value = "";
+        update();
+        inputElement.focus();
+    });
+}
+
+themeElement.addEventListener("click", toggleTheme);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", renderTheme);
+renderTheme();
+
+brandsElement.replaceChildren(...services.map(brandElement));
+
 telElement.addEventListener("input", update);
 textElement.addEventListener("input", update);
 window.addEventListener("hashchange", load);
 load();
+
+// Start typing at the end of the prefilled value.
+telElement.focus();
+telElement.setSelectionRange(telElement.value.length, telElement.value.length);
+
+registerServiceWorker((apply) => {
+    applyElement.addEventListener("click", apply, { once: true });
+    updateElement.hidden = false;
+});

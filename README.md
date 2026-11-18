@@ -12,3 +12,9 @@ Plain HTML and JavaScript, no build step. [Bun](https://bun.sh) runs the tests a
 
     bun test
     bun index.html
+
+## Installable app
+
+The page is a PWA: `manifest.webmanifest`, `icons/` and the service worker `sw.js`, which caches every file so the app works offline.
+
+`sw.js` carries a `VERSION` hashed from the cached files. After changing any of them, run `make stamp` (the tests fail if you forget). Open pages then download the new version in the background and show an "Update" button that switches to it.

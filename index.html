@@ -6,7 +6,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Call Me</title>
   <link rel="stylesheet" href="css/pico.min.css">
+  <script>
+    // Apply the saved theme before the first paint; without one the system setting applies.
+    try {
+      const theme = localStorage.getItem("theme");
+      if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+    } catch { }
+  </script>
   <link rel="shortcut icon" href="favicon.ico">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="theme-color" content="#2196f3">
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-KRE2B181CW"></script>
@@ -45,6 +55,95 @@
     #links .copy:focus-visible {
       outline: 2px solid currentColor;
       outline-offset: 2px;
+    }
+
+    .field {
+      position: relative;
+      margin-bottom: var(--spacing);
+    }
+
+    #app .field input {
+      margin-bottom: 0;
+      padding-right: 2.5rem;
+    }
+
+    .field .clear {
+      all: unset;
+      position: absolute;
+      top: 50%;
+      right: .5rem;
+      transform: translateY(-50%);
+      width: 1.75rem;
+      text-align: center;
+      font-size: 1.5rem;
+      line-height: 1.75rem;
+      opacity: .5;
+      cursor: pointer;
+    }
+
+    .field .clear:hover,
+    .field .clear:focus-visible {
+      opacity: 1;
+    }
+
+    .field .clear[hidden] {
+      display: none;
+    }
+
+    #brands {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1em;
+      margin-bottom: var(--spacing);
+    }
+
+    #brands .icon {
+      width: 1.6em;
+      height: 1.6em;
+    }
+
+    .heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1em;
+    }
+
+    #theme {
+      all: unset;
+      padding: .15em;
+      opacity: .6;
+      cursor: pointer;
+    }
+
+    #theme:hover,
+    #theme:focus-visible {
+      opacity: 1;
+    }
+
+    #update {
+      position: fixed;
+      left: 50%;
+      bottom: 1rem;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 1em;
+      padding: .6em 1em;
+      border-radius: var(--border-radius);
+      background: var(--card-background-color);
+      box-shadow: var(--card-box-shadow);
+      white-space: nowrap;
+    }
+
+    #update[hidden] {
+      display: none;
+    }
+
+    #update button {
+      width: auto;
+      margin: 0;
+      padding: .3em .9em;
     }
 
     .copied {
@@ -94,11 +193,20 @@
   <div id="app">
     <main class="container">
       <article class="">
-        <h4>Create instant links to call or message you</h4>
-        <div>
-          <input id="tel" placeholder="Phone number or username" autofocus>
-          <input id="text" placeholder="Optional message to prefill">
+        <div class="heading">
+          <h4>Create instant links to call or message you</h4>
+          <button type="button" id="theme"></button>
         </div>
+        <div class="field">
+          <input id="tel" placeholder="Phone number or username" autocomplete="off" data-1p-ignore autofocus>
+          <button type="button" class="clear" data-for="tel" title="Clear" aria-label="Clear the phone number or username" hidden>&times;</button>
+        </div>
+        <div class="field">
+          <input id="text" placeholder="Optional message to prefill" autocomplete="off" data-1p-ignore>
+          <button type="button" class="clear" data-for="text" title="Clear" aria-label="Clear the message" hidden>&times;</button>
+        </div>
+
+        <div id="brands" hidden></div>
 
         <p id="hint" hidden></p>
 
@@ -126,6 +234,11 @@
         </div>
       </article>
     </main>
+  </div>
+
+  <div id="update" hidden>
+    A new version is available.
+    <button type="button" id="apply">Update</button>
   </div>
 
   <script type="module" src="script.js"></script>

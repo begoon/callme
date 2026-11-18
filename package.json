@@ -5,6 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "bun index.html",
+        "stamp": "bun stamp.js",
         "test": "bun test"
     },
     "repository": "github:begoon/callme",

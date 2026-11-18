@@ -10,3 +10,6 @@ dev:
 
 test:
 	bun test
+
+stamp:
+	bun stamp.js
