@@ -1,79 +1,42 @@
-const { createApp } = Vue;
+import { buildLinks } from "./links.js";
 
-function isNumeric(str) {
-    if (typeof str != "string") return false;
-    return !isNaN(str) && !isNaN(parseFloat(str));
+const telElement = document.getElementById("tel");
+const tooltipElement = document.getElementById("tooltip");
+
+let links = {};
+let tooltipTimeout = null;
+
+function render() {
+    links = buildLinks(telElement.value);
+    for (const [id, link] of Object.entries(links)) {
+        const linkElement = document.getElementById(id);
+        linkElement.href = link;
+        linkElement.textContent = link;
+    }
 }
 
-const trimLeadingZeroes = (text) => text.replace(/^0+/, "");
-const trimLeadingPluses = (text) => text.replace(/^\++/, "");
-const removeNonNumeric = (text) => text.replace(/\D/g, "");
-const removeBlanks = (text) => text.replace(/\s/g, "");
-const removeParentheses = (text) => text.replace(/[\(\)]/g, "");
+function setTooltip(text) {
+    clearTimeout(tooltipTimeout);
+    tooltipElement.textContent = text;
+    tooltipElement.hidden = false;
+    tooltipTimeout = setTimeout(() => (tooltipElement.hidden = true), 3000);
+}
 
-createApp({
-    data() {
-        return {
-            rawTel: "44 (759) 000 1122",
-            tooltip: "",
-            tooltipTimeout: null,
-        };
-    },
-    computed: {
-        telWithoutBlanks() {
-            return removeBlanks(this.rawTel);
-        },
-        telNormalized() {
-            return trimLeadingZeroes(removeNonNumeric(this.rawTel));
-        },
-        wa() {
-            return "https://api.whatsapp.com/send?phone=" + this.telNormalized;
-        },
-        wa2() {
-            return "https://wa.me/" + this.telNormalized;
-        },
-        tg() {
-            return "https://t.me/" + this.telWithoutBlanks;
-        },
-        sg() {
-            return "https://signal.me/#p/+" + this.telNormalized;
-        },
-        viber() {
-            return "viber://chat?number=" + this.telNormalized;
-        },
-        skype() {
-            if (isNumeric(removeParentheses(this.telWithoutBlanks))) {
-                return "skype:+" + this.telNormalized + "?call";
-            } else {
-                return "skype:" + this.telWithoutBlanks + "?chat";
-            }
-        },
-    },
-    methods: {
-        async clipboard(value) {
-            console.log(value);
-            await navigator.clipboard.writeText(value);
-        },
-        setTooltip(text) {
-            if (this.tooltipTimeout) {
-                clearTimeout(this.tooltipTimeout);
-                this.tooltipTimeout = null;
-            }
-            this.tooltip = text;
-            this.tooltipTimeout = setTimeout(() => (this.tooltip = ""), 3000);
-        },
-        activatePressTooltip() {
-            this.setTooltip("Click to copy");
-        },
-        activateCopiedTooltip() {
-            this.setTooltip("Copied");
-        },
-        activateExampleTooltip() {
-            this.setTooltip("Click to copy an example");
-        },
-        async copyHandler(id) {
-            this.activateCopiedTooltip();
-            await this.clipboard(id);
-        },
-    },
-}).mount("#app");
+for (const copyElement of document.querySelectorAll(".copy")) {
+    copyElement.addEventListener("mouseover", () => setTooltip("Click to copy"));
+    copyElement.addEventListener("click", async () => {
+        await navigator.clipboard.writeText(links[copyElement.dataset.link]);
+        setTooltip("Copied");
+    });
+}
+
+for (const exampleElement of document.querySelectorAll(".example")) {
+    exampleElement.addEventListener("mouseover", () => setTooltip("Click to copy an example"));
+    exampleElement.addEventListener("click", () => {
+        telElement.value = exampleElement.textContent;
+        render();
+    });
+}
+
+telElement.addEventListener("input", render);
+render();

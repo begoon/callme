@@ -1,9 +1,12 @@
-# callmeback.in
+# callme
 
-[![Test](https://github.com/begoon/callmeback/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/begoon/callmeback/actions/workflows/test.yaml)
+[![Test](https://github.com/begoon/callme/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/begoon/callme/actions/workflows/test.yaml)
 
-[![Deployment](https://github.com/begoon/callmeback/actions/workflows/pages/pages-build-deployment/badge.svg?branch=release)](https://github.com/begoon/callmeback/actions/workflows/pages/pages-build-deployment)
+Create an instant link to open WhatsApp, Telegram, Signal or Viber with ease.
 
-Create an instant link to open WhatsApp, Telegram, Signal, Viber or Skype with ease.
+[demin.ws/callme](https://demin.ws/callme/)
 
-[callmeback.in](https://callmeback.in)
+Plain HTML and JavaScript, no build step. [Bun](https://bun.sh) runs the tests and the local server:
+
+    bun test
+    bun index.html
