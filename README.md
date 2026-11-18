@@ -2,7 +2,9 @@
 
 [![Test](https://github.com/begoon/callme/actions/workflows/test.yaml/badge.svg?branch=main)](https://github.com/begoon/callme/actions/workflows/test.yaml)
 
-Create an instant link to open WhatsApp, Telegram, Signal or Viber with ease.
+Create instant links to call or message you: WhatsApp, Telegram, Signal, Viber, phone call, SMS, FaceTime and Zalo for a phone number; Telegram, Messenger, Instagram, Snapchat and LINE for a username.
+
+The page address carries the input, e.g. `https://demin.ws/callme/#447590001122`, so the page itself can be shared.
 
 [demin.ws/callme](https://demin.ws/callme/)
 
